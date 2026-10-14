@@ -1,3 +1,8 @@
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 from typing import Any
 import asyncio
 import httpx
@@ -12,8 +17,19 @@ mcp = FastMCP("weather", host="0.0.0.0", port=port)
 WEATHERAPI_BASE = "https://api.weatherapi.com/v1"
 USER_AGENT = "weather-app/1.0"
 
-# Get API key from environment variable
+# Get API key from environment variable or .env
 API_KEY = os.getenv("WEATHERAPI_KEY")
+if not API_KEY:
+    for env_path in [".env", "../.env", "../../.env"]:
+        if os.path.exists(env_path):
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip().startswith("WEATHERAPI_KEY="):
+                        API_KEY = line.strip().split("=", 1)[1].strip("\"' ")
+                        os.environ["WEATHERAPI_KEY"] = API_KEY
+                        break
+        if API_KEY:
+            break
 
 async def make_weather_request(endpoint: str, params: dict[str, str]) -> dict[str, Any] | None:
     """Make a request to the WeatherAPI with proper error handling."""

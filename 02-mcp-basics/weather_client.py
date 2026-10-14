@@ -16,6 +16,11 @@ Cách chạy (cùng thư mục với weather_server.py, client tự khởi độ
 import asyncio
 import sys
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
